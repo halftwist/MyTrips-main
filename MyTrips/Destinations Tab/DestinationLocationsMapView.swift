@@ -23,6 +23,7 @@ struct DestinationLocationsMapView: View {
         searchPlacemarks + destination.placemarks
     }
     var destination: Destination
+    @State private var selectedPlacemark: MTPlacemark?
     
     var body: some View {
         @Bindable var destination = destination
@@ -50,22 +51,34 @@ struct DestinationLocationsMapView: View {
             }
         }
         .padding(.horizontal)
-        Map(position: $cameraPosition) {
+        Map(position: $cameraPosition, selection: $selectedPlacemark) {
             ForEach(listPlacemarks) { placemark in
-                if placemark.destination != nil {
-                    Marker(coordinate: placemark.coordinate) {
-                        Label(placemark.name, systemImage: "star")
+                Group {
+                    if placemark.destination != nil {
+                        Marker(coordinate: placemark.coordinate) {
+                            Label(placemark.name, systemImage: "star")
+                        }
+                        .tint(.yellow)
+                    } else {
+                        Marker(placemark.name, coordinate: placemark.coordinate)   // generic marker
                     }
-                    .tint(.yellow)
-                } else {
-                    Marker(placemark.name, coordinate: placemark.coordinate)   // generic marker
-                }
-            }
+                }.tag(placemark)  // causes placemark Marker to be enlarged showing it has been selected
+           }
         }
+        .sheet(item: $selectedPlacemark) { selectedPlacemark in
+            LocationDetailView(
+                destination: destination,
+                selectedPlacemark: selectedPlacemark
+            )
+                .presentationDetents([.height(450)])
+        }
+       
         .safeAreaInset(edge: .bottom) {
             HStack {
                 TextField("Search...", text: $searchText)
                     .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
                     .focused($searchFieldFocus)
                     .overlay(alignment: .trailing) {
                         if searchFieldFocus {
@@ -86,6 +99,7 @@ struct DestinationLocationsMapView: View {
                                 visibleRegion: visibleRegion
                             )
                             searchText = ""
+                            cameraPosition = .automatic
                         }
                     }
                 if !searchPlacemarks.isEmpty {
