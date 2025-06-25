@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,6 +16,7 @@
 		BB9432DB2B41D76F007BAAC6 /* DestinationLocationsMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9432DA2B41D76F007BAAC6 /* DestinationLocationsMapView.swift */; };
 		DD1D33002E09D9DA0031A1BB /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1D32FF2E09D9DA0031A1BB /* Destination.swift */; };
 		DD1D33022E09DC060031A1BB /* MTPlacemark.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1D33012E09DC060031A1BB /* MTPlacemark.swift */; };
+		DD1D33042E0B198E0031A1BB /* DestinationsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD1D33032E0B198E0031A1BB /* DestinationsListView.swift */; };
 		DD470A3F2E09CDB800697F46 /* SampleParisLocations.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD470A3E2E09CDB800697F46 /* SampleParisLocations.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,8 +31,13 @@
 		BB9432DA2B41D76F007BAAC6 /* DestinationLocationsMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationLocationsMapView.swift; sourceTree = "<group>"; };
 		DD1D32FF2E09D9DA0031A1BB /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		DD1D33012E09DC060031A1BB /* MTPlacemark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTPlacemark.swift; sourceTree = "<group>"; };
+		DD1D33032E0B198E0031A1BB /* DestinationsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationsListView.swift; sourceTree = "<group>"; };
 		DD470A3E2E09CDB800697F46 /* SampleParisLocations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleParisLocations.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DDE857FA2E0C283900010823 /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BB9432C22B41D633007BAAC6 /* Frameworks */ = {
@@ -67,6 +73,7 @@
 				BB9432CA2B41D633007BAAC6 /* StartTab.swift */,
 				BB9432DC2B41D7D8007BAAC6 /* My Trip Tab */,
 				BB9432DD2B41D7ED007BAAC6 /* Destinations Tab */,
+				DDE857FA2E0C283900010823 /* Services */,
 				DD1D32FE2E09D99E0031A1BB /* Models */,
 				BB9432CC2B41D635007BAAC6 /* Assets.xcassets */,
 				BB9432D62B41D688007BAAC6 /* Launch Screen.storyboard */,
@@ -96,6 +103,7 @@
 			children = (
 				BB9432DA2B41D76F007BAAC6 /* DestinationLocationsMapView.swift */,
 				DD470A3E2E09CDB800697F46 /* SampleParisLocations.swift */,
+				DD1D33032E0B198E0031A1BB /* DestinationsListView.swift */,
 			);
 			path = "Destinations Tab";
 			sourceTree = "<group>";
@@ -123,6 +131,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DDE857FA2E0C283900010823 /* Services */,
 			);
 			name = MyTrips;
 			productName = MyTrips;
@@ -181,6 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB9432CB2B41D633007BAAC6 /* StartTab.swift in Sources */,
+				DD1D33042E0B198E0031A1BB /* DestinationsListView.swift in Sources */,
 				DD470A3F2E09CDB800697F46 /* SampleParisLocations.swift in Sources */,
 				DD1D33002E09D9DA0031A1BB /* Destination.swift in Sources */,
 				BB9432DB2B41D76F007BAAC6 /* DestinationLocationsMapView.swift in Sources */,
