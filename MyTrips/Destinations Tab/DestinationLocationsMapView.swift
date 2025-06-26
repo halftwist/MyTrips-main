@@ -24,6 +24,7 @@ struct DestinationLocationsMapView: View {
     }
     var destination: Destination
     @State private var selectedPlacemark: MTPlacemark?
+    @State private var isManualMarker = false
     
     var body: some View {
         @Bindable var destination = destination
@@ -51,21 +52,54 @@ struct DestinationLocationsMapView: View {
             }
         }
         .padding(.horizontal)
-        Map(position: $cameraPosition, selection: $selectedPlacemark) {
-            ForEach(listPlacemarks) { placemark in
-                Group {
-                    if placemark.destination != nil {
-                        Marker(coordinate: placemark.coordinate) {
-                            Label(placemark.name, systemImage: "star")
+        MapReader { proxy in
+            Map(position: $cameraPosition, selection: $selectedPlacemark) {
+                ForEach(listPlacemarks) { placemark in
+                    if isManualMarker {
+                        if placemark.destination != nil {
+                            Marker(coordinate: placemark.coordinate) {
+                                Label(placemark.name, systemImage: "star")
+                            }
+                            .tint(.yellow)
+                        } else {
+                            Marker(placemark.name, coordinate: placemark.coordinate)   // generic marker
                         }
-                        .tint(.yellow)
                     } else {
-                        Marker(placemark.name, coordinate: placemark.coordinate)   // generic marker
+                        Group {
+                            if placemark.destination != nil {
+                                Marker(coordinate: placemark.coordinate) {
+                                    Label(placemark.name, systemImage: "star")
+                                }
+                                .tint(.yellow)
+                            } else {
+                                Marker(placemark.name, coordinate: placemark.coordinate)   // generic marker
+                            }
+                        }.tag(placemark)  // causes placemark Marker to be enlarged showing it has been selected
                     }
-                }.tag(placemark)  // causes placemark Marker to be enlarged showing it has been selected
-           }
+               }
+            }
+            .onTapGesture { position in
+                
+                if isManualMarker {
+                    if let coordinate = proxy.convert(position, from: .local) {
+                        let mtPlacemark = MTPlacemark(
+                            name: "",
+                            address: "",
+                            latitude: coordinate.latitude,
+                            longitude: coordinate.longitude
+                        )
+                   //     print(coordinate)
+                        modelContext.insert(mtPlacemark)
+                        selectedPlacemark = mtPlacemark
+                    }
+                }
+            }
         }
-        .sheet(item: $selectedPlacemark) { selectedPlacemark in
+        .sheet(item: $selectedPlacemark, onDismiss: {
+            if isManualMarker {
+                MapManager.removeSearchResults(modelContext)
+            }
+        }) { selectedPlacemark in
             LocationDetailView(
                 destination: destination,
                 selectedPlacemark: selectedPlacemark
@@ -74,46 +108,61 @@ struct DestinationLocationsMapView: View {
         }
        
         .safeAreaInset(edge: .bottom) {
-            HStack {
-                TextField("Search...", text: $searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .focused($searchFieldFocus)
-                    .overlay(alignment: .trailing) {
-                        if searchFieldFocus {
-                            Button {
-                                searchText = ""
-                                searchFieldFocus = false
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                            }
-                            .offset(x: -3)
-                        }
-                    }
-                    .onSubmit {
-                        Task {
-                            await MapManager.searchPlaces(
-                                modelContext,
-                                searchText: searchText,
-                                visibleRegion: visibleRegion
-                            )
-                            searchText = ""
-                            cameraPosition = .automatic
-                        }
-                    }
-                if !searchPlacemarks.isEmpty {
-                    Button {
-                        MapManager.removeSearchResults(modelContext)
-                    } label: {
-                        Image(systemName: "mappin.slash.circle.fill")
-                            .imageScale(.large)
-                    }
-                    .foregroundStyle(.white)
-                    .padding(8)
-                    .background(.red)
-                    .clipShape(.circle)
+            VStack {
+                Toggle(isOn: $isManualMarker) {
+                   Label("Tap marker placement in: \(isManualMarker ? "On" : "OFF")",
+                         systemImage: isManualMarker ? "mappin.circel" : "mappin.slash.circel")
                 }
+                .fontWeight(.bold)
+                .toggleStyle(.button)
+                .background(.ultraThinMaterial)
+                .onChange(of: isManualMarker) {
+                    MapManager.removeSearchResults(modelContext)
+                }
+                if !isManualMarker {
+                    HStack {
+                        TextField("Search...", text: $searchText)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .focused($searchFieldFocus)
+                            .overlay(alignment: .trailing) {
+                                if searchFieldFocus {
+                                    Button {
+                                        searchText = ""
+                                        searchFieldFocus = false
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                    }
+                                    .offset(x: -3)
+                                }
+                            }
+                            .onSubmit {
+                                Task {
+                                    await MapManager.searchPlaces(
+                                        modelContext,
+                                        searchText: searchText,
+                                        visibleRegion: visibleRegion
+                                    )
+                                    searchText = ""
+                                    cameraPosition = .automatic
+                                }
+                            }
+                        if !searchPlacemarks.isEmpty {
+                            Button {
+                                MapManager.removeSearchResults(modelContext)
+                            } label: {
+                                Image(systemName: "mappin.slash.circle.fill")
+                                    .imageScale(.large)
+                            }
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(.red)
+                            .clipShape(.circle)
+                        }
+                    }
+                }
+                
             }
             .padding()
         }
@@ -134,12 +183,12 @@ struct DestinationLocationsMapView: View {
     }
 }
 
-//#Preview {
-//    let container = Destination.preview
-//    let fetchDescriptor = FetchDescriptor<Destination>()
-//    let destination = try! container.mainContext.fetch(fetchDescriptor)[0]
-//    return NavigationStack {
-//        DestinationLocationsMapView(destination: destination)
-//    }
-//    .modelContainer(Destination.preview)
-//}
+#Preview {
+    let container = Destination.preview
+    let fetchDescriptor = FetchDescriptor<Destination>()
+    let destination = try! container.mainContext.fetch(fetchDescriptor)[0]
+    return NavigationStack {
+        DestinationLocationsMapView(destination: destination)
+    }
+    .modelContainer(Destination.preview)
+}
