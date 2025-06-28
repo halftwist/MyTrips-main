@@ -52,7 +52,9 @@ struct DestinationLocationsMapView: View {
             }
         }
         .padding(.horizontal)
-        MapReader { proxy in
+        // MapReader The map reader’s content builder receives a MapProxy instance. You can use this instance to get the information you’ll need to convert between a MapCamera and a MKMapRect or MKCoordinateRegion.
+
+        MapReader { proxy in  // proxy - A proxy for accessing sizing information about a given map view.
             Map(position: $cameraPosition, selection: $selectedPlacemark) {
                 ForEach(listPlacemarks) { placemark in
                     if isManualMarker {
