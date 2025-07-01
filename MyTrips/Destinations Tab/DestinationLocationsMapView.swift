@@ -104,7 +104,10 @@ struct DestinationLocationsMapView: View {
         }) { selectedPlacemark in
             LocationDetailView(
                 destination: destination,
-                selectedPlacemark: selectedPlacemark
+                selectedPlacemark: selectedPlacemark,
+                showRoute: .constant(false),
+                travelInterval: .constant(nil),
+                transportType: .constant(.walking)
             )
                 .presentationDetents([.height(450)])
         }
